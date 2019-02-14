@@ -1,5 +1,5 @@
 {
-  "name": "webapck-docgen-plugin",
+  "name": "webpack-docgen-plugin",
   "version": "0.0.1",
   "description": "Automatically generate documentation for JavaScript function.",
   "main": "index.js",
@@ -14,9 +14,9 @@
     "JavaScript",
     "annotation"
   ],
-  "bugs": "https://github.com/webkong/webapck-docgen-plugin/issues",
-  "homepage": "https://github.com/webkong/webapck-docgen-plugin",
-  "repository": "https://github.com/webkong/webapck-docgen-plugin.git",
+  "bugs": "https://github.com/webkong/webpack-docgen-plugin/issues",
+  "homepage": "https://github.com/webkong/webpack-docgen-plugin",
+  "repository": "https://github.com/webkong/webpack-docgen-plugin.git",
   "license": "ISC",
   "engines": {
     "node": ">= 4"
