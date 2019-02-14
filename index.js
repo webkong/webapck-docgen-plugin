@@ -39,7 +39,7 @@ class WebpackDocGenPlugin {
         let singleFiles = {};
 
         let dir = this.options.dir;
-        if(!path.isAbsolute(dir)){
+        if (!path.isAbsolute(dir)) {
           dir = path.join(compiler.options.context, dir);
         }
         fs.readdirSync(dir)
@@ -49,7 +49,7 @@ class WebpackDocGenPlugin {
             } else {
               const jsReg = /\.js$/;
               const pagePath = fs
-                .readdirSync(path.join(context, dir, './' + filename))
+                .readdirSync(path.join(dir, './' + filename))
                 .filter(filename => jsReg.test(filename));
               pagePath.map(name => {
                 pagesPath[filename] =
@@ -99,39 +99,40 @@ class WebpackDocGenPlugin {
             filePath = path.resolve(context, elem.path);
             moduleName = elem.name
           }
-          list += '## ' + moduleName + '\n\n';
+
           const file = fs.readFileSync(filePath, {
             encoding: 'UTF-8'
           });
 
           // const infoArr = file.match(/@name ([\w-]+)\n \* @description ([^\f\n\r\t\v]+)/g)
           const infoArr = file.match(/\/\*(\s|.)*?\*\//g)
-
-          infoArr.forEach((block) => {
-            const arr = block.split('\n * ');
-            const name = arr[1].split(' ')[1];
-            const paramReg = /@param \{([\w|]+)\} (\w+)( - )?([\S ]+)?/;
-            if (arr[1].split(' ')[0] === '@name') {
-              list += '### ' + name + '\n\n';
-              list += arr[2].replace('@description ', '>') + '\n\n';
-              const params = arr.slice(3, -1);
-              if (params.length > 0) {
-                list += '|params| type | required | description | \n';
-                list += '| ---- | ---- | ---- | ---- | \n';
-                list += params.map((param) => {
-                  const paramArr = paramReg.exec(param);
-                  if (paramArr) {
-                    return ('|' + paramArr[2] + '|' + paramArr[1].replace('|', '/') + '|' + (paramArr[1].indexOf('=') > -1 ? 'No' : 'Yes') + '|' + (paramArr[4] || ' ') + '| \n\n');
-                  }
-                }).join('');
+          if (infoArr) {
+            list += '## ' + moduleName + '\n\n';
+            infoArr.forEach((block) => {
+              const arr = block.split('\n * ');
+              const name = arr[1].split(' ')[1];
+              const paramReg = /@param \{([\w|]+)\} (\w+)( - )?([\S ]+)?/;
+              if (arr[1].split(' ')[0] === '@name') {
+                list += '### ' + name + '\n\n';
+                list += arr[2].replace('@description ', '>') + '\n\n';
+                const params = arr.slice(3, -1);
+                if (params.length > 0) {
+                  list += '|params| type | required | description | \n';
+                  list += '| ---- | ---- | ---- | ---- | \n';
+                  list += params.map((param) => {
+                    const paramArr = paramReg.exec(param);
+                    if (paramArr) {
+                      return ('|' + paramArr[2] + '|' + paramArr[1].replace('|', '/') + '|' + (paramArr[1].indexOf('=') > -1 ? 'No' : 'Yes') + '|' + (paramArr[4] || ' ') + '| \n\n');
+                    }
+                  }).join('');
+                }
+                const returnStr = arr[arr.length - 1];
+                list += '>' + returnStr.replace('@', '').replace(/\n[ ]+\*\//, '')
+                list += '\n\n';
               }
-              const returnStr = arr[arr.length - 1];
-              list += '>' + returnStr.replace('@', '').replace(/\n[ ]+\*\//, '')
-              list += '\n\n';
-            }
-          })
-          list += '\n\n';
-
+            })
+            list += '\n\n';
+          }
         })
       } else {
         throw new Error('not find entry')
