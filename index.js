@@ -38,7 +38,10 @@ class WebpackDocGenPlugin {
         let pagesPath = {};
         let singleFiles = {};
 
-        const dir = this.options.dir;
+        let dir = this.options.dir;
+        if(!path.isAbsolute(dir)){
+          dir = path.join(compiler.options.context, dir);
+        }
         fs.readdirSync(dir)
           .map(filename => {
             if (reg.test(filename)) {
