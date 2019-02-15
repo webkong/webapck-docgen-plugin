@@ -10,15 +10,15 @@ class WebpackDocGenPlugin {
   constructor(options) {
     this.options = options;
   }
-
-
   apply(compiler) {
     compiler.hooks.emit.tap(pluginName, compilation => {
+      //title
       let list = '# ' + (this.options.title || 'Utils list') + '\n\n';
+      //description
       list += this.options.description || 'Function & Modules list.' + '\n\n';
 
       let context, entry;
-
+      // base context path
       if (!this.options.context) {
         context = compiler.options.context;
       } else if (!path.isAbsolute(this.options.context)) {
@@ -26,11 +26,13 @@ class WebpackDocGenPlugin {
       } else {
         context = this.options.context;
       }
+      //entry
       if (!this.options.entry) {
         entry = compiler.options.entry;
       } else {
         entry = this.options.entry;
       }
+      // if options has dir
       if (!this.options.dir) {
 
       } else {

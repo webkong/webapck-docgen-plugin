@@ -90,10 +90,22 @@ list.md
 
 >Converts time into the specified format
 
-|params| type | required | description | 
-| ---- | ---- | ---- | ---- | 
-|time|String/Number|Yes| | 
+| params | type          | required | description |
+| ------ | ------------- | -------- | ----------- |
+| time   | String/Number | Yes      |             |
 
 >return {String}
 
 ```
+
+## Demo
+
+[https://github.com/webkong/js-utils](https://github.com/webkong/js-utils)
+
+## License
+
+[MIT](http://opensource.org/licenses/MIT)
+
+## Author
+
+![me](https://s.gravatar.com/avatar/1fe24100ab2109076fd777d1ad0a28c5?s=100)
