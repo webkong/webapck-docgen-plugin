@@ -113,7 +113,7 @@ class WebpackDocGenPlugin {
             infoArr.forEach((block) => {
               const arr = block.split('\n * ');
               const name = arr[1].split(' ')[1];
-              const paramReg = /@param \{([\w|]+)\} (\w+)( - )?([\S ]+)?/;
+              const paramReg = /@param \{([\w|=]+)\} (\w+)( - )?([\S ]+)?/;
               if (arr[1].split(' ')[0] === '@name') {
                 list += '### ' + name + '\n\n';
                 list += arr[2].replace('@description ', '>') + '\n\n';
@@ -121,10 +121,14 @@ class WebpackDocGenPlugin {
                 if (params.length > 0) {
                   list += '|params| type | required | description | \n';
                   list += '| ---- | ---- | ---- | ---- | \n';
-                  list += params.map((param) => {
+                  list += params.map((param,index) => {
                     const paramArr = paramReg.exec(param);
+                    let suffix = '| \n';
+                    if(index === params.length-1){
+                      suffix = '| \n\n'
+                    }
                     if (paramArr) {
-                      return ('|' + paramArr[2] + '|' + paramArr[1].replace('|', '/') + '|' + (paramArr[1].indexOf('=') > -1 ? 'No' : 'Yes') + '|' + (paramArr[4] || ' ') + '| \n\n');
+                      return ('|' + paramArr[2] + '|' + paramArr[1].replace('|', '/').replace('=','') + '|' + (paramArr[1].indexOf('=') > -1 ? 'No' : 'Yes') + '|' + (paramArr[4] || ' ') + suffix);
                     }
                   }).join('');
                 }

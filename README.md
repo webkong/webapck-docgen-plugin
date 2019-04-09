@@ -50,7 +50,7 @@ src
 /**
  * @name format
  * @description Converts time into the specified format
- * @param {String|Number} time
+ * @param {String|Number} time - time to format
  * @param {String=} fmt
  * @return {String}
  */
@@ -92,7 +92,8 @@ list.md
 
 | params | type          | required | description |
 | ------ | ------------- | -------- | ----------- |
-| time   | String/Number | Yes      |             |
+| time   | String/Number | Yes      |  time to format   |
+| fmt   | String | No      |     |
 
 >return {String}
 
