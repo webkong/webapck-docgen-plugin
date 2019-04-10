@@ -1,6 +1,6 @@
 {
   "name": "webpack-docgen-plugin",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Automatically generate documentation for JavaScript function.",
   "main": "index.js",
   "scripts": {
