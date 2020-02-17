@@ -47,8 +47,7 @@ class WebpackDocGenPlugin {
         const prefix = arr[arr.length - 1];
         fs.readdirSync(dir).map(filename => {
           if (reg.test(filename)) {
-            singleFiles[filename.replace(/\.\S+/, "")] =
-              dir + "/" + filename;
+            singleFiles[filename.replace(/\.\S+/, "")] = dir + "/" + filename;
           } else {
             const jsReg = /\.js$/;
             const pagePath = fs
@@ -84,79 +83,90 @@ class WebpackDocGenPlugin {
         });
         entry = temp;
       }
-      if (entry) {
-        entry.forEach(elem => {
-          let filePath = "";
-          let moduleName = "";
-          if (typeof elem === "string") {
-            filePath = path.resolve(context, elem);
-            const lastName = filePath.match(/\/([a-z0-9A-z]*)\./)[1];
-            if (lastName === "index") {
-              moduleName = filePath.match(/([a-z0-9A-z]+)\/[a-z0-9A-z]+\./)[1];
-            } else {
-              moduleName = lastName;
-            }
-          } else {
-            filePath = path.resolve(context, elem.path);
-            moduleName = elem.name;
-          }
-
-          const file = fs.readFileSync(filePath, {
-            encoding: "UTF-8"
-          });
-
-          // const infoArr = file.match(/@name ([\w-]+)\n \* @description ([^\f\n\r\t\v]+)/g)
-          const infoArr = file.match(/\/\*(\s|.)*?\*\//g);
-          if (infoArr) {
-            list += "## " + moduleName + "\n\n";
-            infoArr.forEach(block => {
-              const arr = block.split("\n * ");
-              const name = arr[1].split(" ")[1];
-              const paramReg = /@param \{([\w|=]+)\} (\w+)( - )?([\S ]+)?/;
-              if (arr[1].split(" ")[0] === "@name") {
-                if(moduleName !== name){
-                  list += "### " + name + "\n\n";
-                }
-                list += arr[2].replace("@description ", ">") + "\n\n";
-                const params = arr.slice(3, -1);
-                if (params.length > 0) {
-                  list += "|params| type | required | description | \n";
-                  list += "| ---- | ---- | ---- | ---- | \n";
-                  list += params
-                    .map((param, index) => {
-                      const paramArr = paramReg.exec(param);
-                      let suffix = "| \n";
-                      if (index === params.length - 1) {
-                        suffix = "| \n\n";
-                      }
-                      if (paramArr) {
-                        return (
-                          "|" +
-                          paramArr[2] +
-                          "|" +
-                          paramArr[1].replace("|", "/").replace("=", "") +
-                          "|" +
-                          (paramArr[1].indexOf("=") > -1 ? "No" : "Yes") +
-                          "|" +
-                          (paramArr[4] || " ") +
-                          suffix
-                        );
-                      }
-                    })
-                    .join("");
-                }
-                const returnStr = arr[arr.length - 1];
-                list +=
-                  ">" + returnStr.replace("@", "").replace(/\n[ ]+\*\//, "");
-                list += "\n\n";
+      
+        if (entry) {
+          entry.forEach(elem => {
+            let filePath = "";
+            let moduleName = "";
+            if (typeof elem === "string") {
+              filePath = path.resolve(context, elem);
+              const lastName = filePath.match(/\/([a-z0-9A-z]*)\./)[1];
+              if (lastName === "index") {
+                moduleName = filePath.match(
+                  /([a-z0-9A-z]+)\/[a-z0-9A-z]+\./
+                )[1];
+              } else {
+                moduleName = lastName;
               }
+            } else {
+              filePath = path.resolve(context, elem.path);
+              moduleName = elem.name;
+            }
+
+            const file = fs.readFileSync(filePath, {
+              encoding: "UTF-8"
             });
-            list += "\n\n";
-          }
-        });
-      } else {
-        throw new Error("not find entry");
-      }
+
+            // const infoArr = file.match(/@name ([\w-]+)\n \* @description ([^\f\n\r\t\v]+)/g)
+            const infoArr = file.match(/\/\*(\s|.)*?\*\//g);
+            if (infoArr) {
+              list += "## " + moduleName + "\n\n";
+              infoArr.forEach(block => {
+                const arr = block.split("\n * ");
+                try {
+                const name = arr[1].split(" ")[1];
+                const paramReg = /@param \{([\w|=]+)\} (\w+)( - )?([\S ]+)?/;
+                if (arr[1].split(" ")[0] === "@name") {
+                  if (moduleName !== name) {
+                    list += "### " + name + "\n\n";
+                  }
+                  list += arr[2].replace("@description ", ">") + "\n\n";
+                  const params = arr.slice(3, -1);
+                  if (params.length > 0) {
+                    list += "|params| type | required | description | \n";
+                    list += "| ---- | ---- | ---- | ---- | \n";
+                    list += params
+                      .map((param, index) => {
+                        const paramArr = paramReg.exec(param);
+                        let suffix = "| \n";
+                        if (index === params.length - 1) {
+                          suffix = "| \n\n";
+                        }
+                        if (paramArr) {
+                          return (
+                            "|" +
+                            paramArr[2] +
+                            "|" +
+                            paramArr[1].replace("|", "/").replace("=", "") +
+                            "|" +
+                            (paramArr[1].indexOf("=") > -1 ? "No" : "Yes") +
+                            "|" +
+                            (paramArr[4] || " ") +
+                            suffix
+                          );
+                        }
+                      })
+                      .join("");
+                  }
+                  const returnStr = arr[arr.length - 1];
+                  list +=
+                    ">" + returnStr.replace("@", "").replace(/\n[ ]+\*\//, "");
+                  list += "\n\n";
+                }
+              } catch (error) {
+                console.warn("Some file don't conform to the annotation specifications");
+                console.info(arr);
+              }
+              }
+              
+              );
+              list += "\n\n";
+            }
+          });
+        } else {
+          throw new Error("not find entry");
+        }
+      
       compilation.assets[this.options.docFile || "list.md"] = {
         source() {
           return list;
